@@ -2,16 +2,17 @@ Parameters:
   VPCCidrBlockParamater:
     Type: String
     Default: 10.0.0.0/16
-  SubnetACidrBlockParamater:
+  PublicSubnetACidr:
     Type: String
     Default: 10.0.0.0/24
-  SubnetCCidrBlockParamater:
+  PublicSubnetCCidr:
     Type: String
     Default: 10.0.1.0/24
   EnvironmentParamater:
     Type: String
     Default: production
 Resources: 
+  # VPC
   VPC:
     Type: AWS::EC2::VPC
     Properties: 
@@ -23,19 +24,62 @@ Resources:
        - Key: stack
          Value: 
            Ref: EnvironmentParamater
-  SubnetA:
+       - Key: Name
+         Value: !Sub "${EnvironmentParamater}-vpc"
+  # InternetGateway Create
+  InternetGateway: 
+    Type: "AWS::EC2::InternetGateway"
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-igw"
+
+  # -------------------------- #
+  # Subnet
+  # -------------------------- #
+  PublicSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: "ap-northeast-1a"
       VpcId:
         Ref: VPC
       CidrBlock: 
-        Ref: SubnetACidrBlockParamater
-  SubnetC:
+        Ref: PublicSubnetACidr
+      Tags:
+       - Key: stack
+         Value: 
+           Ref: EnvironmentParamater
+       - Key: Name
+         Value: !Sub "${EnvironmentParamater}-public-subnet-a"
+  PublicSubnetC:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: "ap-northeast-1c"
       VpcId:
         Ref: VPC
       CidrBlock: 
-        Ref: SubnetCCidrBlockParamater
+        Ref: PublicSubnetCCidr
+      Tags:
+       - Key: stack
+         Value: 
+           Ref: EnvironmentParamater
+       - Key: Name
+         Value: !Sub "${EnvironmentParamater}-public-subnet-c"
+  # -------------------------- #
+  # RouteTable
+  # -------------------------- #
+  PublicRouteTableA: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-public-route-a"
+  PublicRouteTableC: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-public-route-c"
+
