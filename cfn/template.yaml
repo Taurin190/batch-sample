@@ -1,7 +1,13 @@
 Parameters:
-  CidrBlockParamater:
+  VPCCidrBlockParamater:
     Type: String
     Default: 10.0.0.0/16
+  SubnetACidrBlockParamater:
+    Type: String
+    Default: 10.0.0.0/24
+  SubnetCCidrBlockParamater:
+    Type: String
+    Default: 10.0.1.0/24
   EnvironmentParamater:
     Type: String
     Default: production
@@ -10,10 +16,26 @@ Resources:
     Type: AWS::EC2::VPC
     Properties: 
       CidrBlock: 
-        Ref: CidrBlockParamater
+        Ref: VPCCidrBlockParamater
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
       Tags:
        - Key: stack
          Value: 
            Ref: EnvironmentParamater
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId:
+        Ref: VPC
+      CidrBlock: 
+        Ref: SubnetACidrBlockParamater
+  SubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId:
+        Ref: VPC
+      CidrBlock: 
+        Ref: SubnetCCidrBlockParamater
