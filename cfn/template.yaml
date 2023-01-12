@@ -8,6 +8,12 @@ Parameters:
   PublicSubnetCCidr:
     Type: String
     Default: 10.0.1.0/24
+  PrivateSubnetACIDR:
+    Type: String
+    Default: 10.0.100.0/24
+  PrivateSubnetCCIDR:
+    Type: String
+    Default: 10.0.200.0/24
   EnvironmentParamater:
     Type: String
     Default: production
@@ -33,7 +39,12 @@ Resources:
       Tags: 
         - Key: Name
           Value: !Sub "${EnvironmentParamater}-igw"
-
+  # IGW Attach
+  InternetGatewayAttachment: 
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC 
   # -------------------------- #
   # Subnet
   # -------------------------- #
@@ -65,6 +76,24 @@ Resources:
            Ref: EnvironmentParamater
        - Key: Name
          Value: !Sub "${EnvironmentParamater}-public-subnet-c"
+  PrivateSubnetA: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1a"
+      CidrBlock: !Ref PrivateSubnetACIDR
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-private-subnet-a"
+  PrivateSubnetC: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      AvailabilityZone: "ap-northeast-1c"
+      CidrBlock: !Ref PrivateSubnetCCIDR
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-private-subnet-c"
   # -------------------------- #
   # RouteTable
   # -------------------------- #
@@ -82,4 +111,57 @@ Resources:
       Tags: 
         - Key: Name
           Value: !Sub "${EnvironmentParamater}-public-route-c"
+  PrivateRouteTableA: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-private-route-a"
+  PrivateRouteTableC: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: !Ref VPC 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${EnvironmentParamater}-private-route-c"
+  # -------------------------- #
+  # Routing
+  # -------------------------- #
+  PublicRouteA: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PublicRouteTableA 
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+  PublicRouteC: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PublicRouteTableC 
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway 
+
+  # -------------------------- #
+  # RouteTable Associate
+  # -------------------------- # 
+  PublicSubnetARouteTableAssociation: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PublicSubnetA 
+      RouteTableId: !Ref PublicRouteTableA
+  PublicSubnetCRouteTableAssociation: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PublicSubnetC 
+      RouteTableId: !Ref PublicRouteTableC
+  PrivateSubnetARouteTableAssociation: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTableA 
+  PrivateSubnetCRouteTableAssociation: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PrivateSubnetC
+      RouteTableId: !Ref PrivateRouteTableC
 
