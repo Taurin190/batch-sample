@@ -15,3 +15,16 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentParamater}-sqs
+  StatusDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Event
+      AttributeDefinitions:
+        - AttributeName: "EventId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "EventId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
