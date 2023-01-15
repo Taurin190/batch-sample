@@ -1,0 +1,17 @@
+Parameters:
+  EnvironmentParamater:
+    Type: String
+    Default: production
+Resources: 
+  BatchQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      DelaySeconds: 0
+      MaximumMessageSize: 262144
+      # 7日間メッセージ保持
+      MessageRetentionPeriod: 604800
+      # workerの負荷を抑えるためにロングポーリングにする => 最大20秒
+      ReceiveMessageWaitTimeSeconds: 20
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentParamater}-sqs
