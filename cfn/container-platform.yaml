@@ -12,3 +12,8 @@ Resources:
       Tags: 
         - Key: Name
           Value: event-driven-sample-repository
+Outputs:
+  ECRRepository:
+    Value: !GetAtt ECRRepository.Arn
+    Export:
+      Name: ECRRepository
