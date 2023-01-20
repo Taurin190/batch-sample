@@ -1,0 +1,14 @@
+Resources:
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: EventDrivenSampleCluster  
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      ImageScanningConfiguration:
+        scanOnPush: true
+      RepositoryName: event-driven-sample-repository
+      Tags: 
+        - Key: Name
+          Value: event-driven-sample-repository
