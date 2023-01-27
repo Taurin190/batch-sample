@@ -28,3 +28,8 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+Outputs:
+  BatchQueue:
+    Value: !GetAtt BatchQueue.QueueName
+    Export:
+      Name: BatchQueueName
