@@ -16,3 +16,6 @@ https://www.l7defense.com/cyber-security/api-gateway-vs-load-balancer/
 - 少ないリクエストであればAPI Gatewayの方がコストメリットはある
 - リクエストが一定して多くなってくるとELBの方がコスト的には安くなる
 - 認証など使用する場合にはAPI Gatewayを使うことになる
+
+SQS作成のサンプル
+https://www.yokoyan.net/entry/2020/01/21/180000
