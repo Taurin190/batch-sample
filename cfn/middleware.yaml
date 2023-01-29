@@ -15,6 +15,22 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentParamater}-sqs
+  SqsQaueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Id: !Ref BatchQueue
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Allow-User-SendMessage
+            Effect: Allow
+            # テスト用なのですべてのユーザにアクセス権限を付与する
+            Principal: "*"
+            Action: "sqs:*"
+            Resource:
+              !GetAtt BatchQueue.Arn
+      Queues:
+        - !Ref BatchQueue
   StatusDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
