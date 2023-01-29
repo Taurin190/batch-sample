@@ -28,10 +28,24 @@ Resources:
             queue_name = os.environ['QUEUE_NAME']
             sqs = boto3.client("sqs", endpoint_url="https://sqs.ap-northeast-1.amazonaws.com")
             try:
-              queue = sqs.get_queue_url(QueueName=queue_name)
-            except:
+              response = sqs.get_queue_url(QueueName=queue_name)
+              queue_url = response['QueueUrl']
+            except Exception as e:
+              print('Exception Message: ' + str(e))
               print('queue not found: ' + queue_name)
 
+              return {
+                'statusCode': 500,
+                'body': json.dumps('Internal Server Error')
+              }
+            
+            try:
+              response = sqs.send_message(QueueUrl=queue_url, MessageBody='Hello')
+              message_id = response['MessageId']
+            except Exception as e:
+              print('Exception Message: ' + str(e))
+              print("Message wasn't sent")
+            
             return {
               'statusCode': 200,
               'body': json.dumps('Hello from Lambda!')
