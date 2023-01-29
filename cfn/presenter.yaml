@@ -14,6 +14,7 @@ Resources:
         Version: '2012-10-17'
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -22,11 +23,12 @@ Resources:
           import json
           import os
           import boto3
+
           def lambda_handler(event, context):
             queue_name = os.environ['QUEUE_NAME']
             sqs = boto3.client("sqs", endpoint_url="https://sqs.ap-northeast-1.amazonaws.com")
             try:
-              queue = sqs.get_queue_by_name(QueueName=queue_name)
+              queue = sqs.get_queue_url(QueueName=queue_name)
             except:
               print('queue not found: ' + queue_name)
 
