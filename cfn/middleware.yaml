@@ -49,3 +49,11 @@ Outputs:
     Value: !GetAtt BatchQueue.QueueName
     Export:
       Name: BatchQueueName
+  StatusDBTableArn:
+    Value: !GetAtt StatusDBTable.Arn
+    Export:
+      Name: StatusDBTableArn
+  StatusDBTable:
+    Value: !Ref StatusDBTable
+    Export:
+      Name: StatusDBTable
