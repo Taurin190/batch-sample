@@ -92,6 +92,57 @@ Resources:
           TABLE_NAME: !ImportValue StatusDBTable
     DependsOn:
       - LambdaServiceRole
+  ConfirmAPILambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |-
+          import json
+          import os
+          import boto3
+
+          def lambda_handler(event, context):
+            try:
+              message_id = event['message_id']
+              response = retrieve_message(message_id)
+            except Exception as e:
+              print('Exception Message: ' + str(e))
+              print("Message wasn't registered: " + queue_name)
+              return {
+                'statusCode': 500,
+                'body': json.dumps('Internal Server Error')
+              }
+            if 'Item' in response:
+              return {
+                'statusCode': 200,
+                'body': json.dumps(response['Item'])
+              }
+            else:
+              return {
+                'statusCode': 404,
+                'body': json.dumps('Not Found')
+              }
+
+          def retrieve_message(message_id):
+            table_name = os.environ['TABLE_NAME']
+            dynamoDB = boto3.resource('dynamodb')
+            table= dynamoDB.Table(table_name)
+            response = table.get_item(
+              Key={
+                'EventId': message_id
+                }
+                )
+
+            return response
+
+      Role: !GetAtt LambdaServiceRole.Arn
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          TABLE_NAME: !ImportValue StatusDBTable
+    DependsOn:
+      - LambdaServiceRole
   HttpApi:
     Type: AWS::ApiGatewayV2::Api
     Properties:
@@ -121,6 +172,27 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: GET /create
+      RouteKey: POST /create
       AuthorizationType: NONE
       Target: !Sub "integrations/${HttpApiCreateIntegration}"
+  HttpApiConfirmIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ConfirmAPILambda.Arn
+      PayloadFormatVersion: '2.0'
+  HttpApiConfirmIntegrationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt ConfirmAPILambda.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*/confirm"
+  HttpApiConfirmRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /confirm
+      AuthorizationType: NONE
+      Target: !Sub "integrations/${HttpApiConfirmIntegration}"
