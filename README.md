@@ -25,3 +25,6 @@ https://zenn.dev/denham/scraps/0169c6fedbae6b
 
 Go言語でSQSのメッセージを取得する
 https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/sqs-example-receive-message.html#sqs-example-receive-mesage
+
+ローカルでのAWS SQS開発環境
+https://zenn.dev/tady/articles/cccbc4d11bf19a
