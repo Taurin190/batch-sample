@@ -19,3 +19,9 @@ https://www.l7defense.com/cyber-security/api-gateway-vs-load-balancer/
 
 SQS作成のサンプル
 https://www.yokoyan.net/entry/2020/01/21/180000
+
+localでlambdaの実行
+https://zenn.dev/denham/scraps/0169c6fedbae6b
+
+Go言語でSQSのメッセージを取得する
+https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/sqs-example-receive-message.html#sqs-example-receive-mesage
