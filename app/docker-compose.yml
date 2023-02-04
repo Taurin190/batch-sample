@@ -6,3 +6,8 @@ services:
     ports:
       - 9324:9324
       - 9325:9325
+  dynamodb:
+    image: amazon/dynamodb-local
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath . -optimizeDbBeforeStartup
+    ports:
+      - 8000:8000
